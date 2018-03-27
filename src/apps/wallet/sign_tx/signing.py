@@ -272,8 +272,11 @@ async def sign_tx(tx: SignTx, root: bip32.HDNode):
                             multisig_get_pubkeys(txi_sign.multisig),
                             txi_sign.multisig.m)
                     elif txi_sign.script_type == InputScriptType.SPENDADDRESS:
-                        txi_sign.script_sig = output_script_p2pkh(
-                            ecdsa_hash_pubkey(key_sign_pub))
+                        if coin.replay_protection:
+                            txi_sign.script_sig = txi_sign.prev_input_script
+                        else:
+                            txi_sign.script_sig = output_script_p2pkh(
+                                ecdsa_hash_pubkey(key_sign_pub))
                     else:
                         raise SigningError(FailureType.ProcessError,
                                            'Unknown transaction type')
@@ -508,14 +511,12 @@ def output_derive_script(o: TxOutputType, coin: CoinInfo, root: bip32.HDNode) ->
         raw_address = base58.decode_check(o.address)
 
     if address_type.check(coin.address_type, raw_address):
-        # p2pkh
         pubkeyhash = address_type.strip(coin.address_type, raw_address)
-        return output_script_p2pkh(pubkeyhash)
+        return (output_script_p2pkh(pubkeyhash)+script_replay_protection(o.block_hash, o.block_height) if coin.replay_protection else output_script_p2pkh(pubkeyhash))
 
     elif address_type.check(coin.address_type_p2sh, raw_address):
-        # p2sh
         scripthash = address_type.strip(coin.address_type_p2sh, raw_address)
-        return output_script_p2sh(scripthash)
+        return (output_script_p2sh(scripthash)+script_replay_protection(o.block_hash, o.block_height) if coin.replay_protection else output_script_p2sh(scripthash))
 
     raise SigningError(FailureType.DataError, 'Invalid address type')
 
@@ -555,8 +556,10 @@ def output_is_change(o: TxOutputType, wallet_path: list, segwit_in: int) -> bool
 def input_derive_script(coin: CoinInfo, i: TxInputType, pubkey: bytes, signature: bytes=None) -> bytes:
     if i.script_type == InputScriptType.SPENDADDRESS:
         # p2pkh or p2sh
+        
         return input_script_p2pkh_or_p2sh(
             pubkey, signature, get_hash_type(coin))
+    
 
     if i.script_type == InputScriptType.SPENDP2SHWITNESS:
         # p2wpkh or p2wsh using p2sh
@@ -628,3 +631,4 @@ def is_change(
         if not multifp.matches(txo.multisig):
             return False
     return output_is_change(txo, wallet_path, segwit_in)
+
