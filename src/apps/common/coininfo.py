@@ -12,8 +12,11 @@ class CoinInfo:
         bech32_prefix: str,
         cashaddr_prefix: str,
         segwit: bool,
-        forkid: int,
-        force_bip143: bool
+        fork_id: int,
+        force_bip143: bool,
+        version_group_id: int,
+        replay_protection : bool
+
     ):
         self.coin_name = coin_name
         self.coin_shortcut = coin_shortcut
@@ -25,9 +28,10 @@ class CoinInfo:
         self.bech32_prefix = bech32_prefix
         self.cashaddr_prefix = cashaddr_prefix
         self.segwit = segwit
-        self.forkid = forkid
+        self.fork_id = fork_id
         self.force_bip143 = force_bip143
-
+        self.version_group_id = version_group_id
+        self.replay_protection = replay_protection
 
 # the following list is generated using tools/codegen/gen_coins.py
 # do not edit manually!
@@ -43,8 +47,10 @@ COINS = [
         bech32_prefix='bc',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Testnet',
@@ -57,8 +63,10 @@ COINS = [
         bech32_prefix='tb',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Bcash',
@@ -71,8 +79,10 @@ COINS = [
         bech32_prefix=None,
         cashaddr_prefix='bitcoincash',
         segwit=False,
-        forkid=0,
+        fork_id=0,
         force_bip143=True,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Bcash Testnet',
@@ -85,8 +95,10 @@ COINS = [
         bech32_prefix=None,
         cashaddr_prefix='bchtest',
         segwit=False,
-        forkid=0,
+        fork_id=0,
         force_bip143=True,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Namecoin',
@@ -99,8 +111,10 @@ COINS = [
         bech32_prefix=None,
         cashaddr_prefix=None,
         segwit=False,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Litecoin',
@@ -113,8 +127,10 @@ COINS = [
         bech32_prefix='ltc',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Dogecoin',
@@ -127,8 +143,10 @@ COINS = [
         bech32_prefix=None,
         cashaddr_prefix=None,
         segwit=False,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Dash',
@@ -141,8 +159,10 @@ COINS = [
         bech32_prefix=None,
         cashaddr_prefix=None,
         segwit=False,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Zcash',
@@ -155,8 +175,10 @@ COINS = [
         bech32_prefix=None,
         cashaddr_prefix=None,
         segwit=False,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=0x03c48270,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Zcash Testnet',
@@ -169,11 +191,13 @@ COINS = [
         bech32_prefix=None,
         cashaddr_prefix=None,
         segwit=False,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=0x03c48270,
+        replay_protection = False,
     ),
     CoinInfo(
-        coin_name='Bitcoin Gold',
+        coin_name='Bgold',
         coin_shortcut='BTG',
         address_type=38,
         address_type_p2sh=23,
@@ -183,8 +207,10 @@ COINS = [
         bech32_prefix='btg',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=79,
+        fork_id=79,
         force_bip143=True,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='DigiByte',
@@ -197,8 +223,10 @@ COINS = [
         bech32_prefix='dgb',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Monacoin',
@@ -211,8 +239,10 @@ COINS = [
         bech32_prefix='mona',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Fujicoin',
@@ -225,8 +255,10 @@ COINS = [
         bech32_prefix='fc',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
         coin_name='Vertcoin',
@@ -239,21 +271,25 @@ COINS = [
         bech32_prefix='vtc',
         cashaddr_prefix=None,
         segwit=True,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = False,
     ),
     CoinInfo(
-        coin_name='Decred Testnet',
-        coin_shortcut='TDCR',
-        address_type=3873,
-        address_type_p2sh=3836,
-        maxfee_kb=10000000,
-        signed_message_header='Decred Signed Message:\n',
-        xpub_magic=0x043587d1,
-        bech32_prefix=None,
+        coin_name='Zencash',
+        coin_shortcut='ZEN',
+        address_type=8329,
+        address_type_p2sh=8342,
+        maxfee_kb=2000000,
+        signed_message_header='Zencash Signed Message:\n',
+        xpub_magic=0x0488b21e,
+        bech32_prefix='zen',
         cashaddr_prefix=None,
         segwit=False,
-        forkid=None,
+        fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+        replay_protection = True,
     ),
 ]

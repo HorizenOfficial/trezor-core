@@ -12,19 +12,28 @@ fields = [
     'bech32_prefix',
     'cashaddr_prefix',
     'segwit',
-    'forkid',
+    'fork_id',
     'force_bip143',
+    'version_group_id',
 ]
 
-coins = json.load(open('../../vendor/trezor-common/coins.json', 'r'))
+support = json.load(open('../../vendor/trezor-common/defs/support.json', 'r'))
+coins = support['trezor2'].keys()
 
 print('COINS = [')
+
 for c in coins:
     print('    CoinInfo(')
+    name = c.replace(' ', '_').lower()
+    if name == 'testnet':
+        name = 'bitcoin_testnet'
+    data = json.load(open('../../vendor/trezor-common/defs/coins/%s.json' % name, 'r'))
     for n in fields:
-        if n == 'xpub_magic':
-            print('        %s=0x%s,' % (n, c[n]))
+        if n in ['xpub_magic', 'version_group_id']:
+            v = '0x%08x' % data[n] if data[n] is not None else 'None'
         else:
-            print('        %s=%s,' % (n, repr(c[n])))
+            v = repr(data[n])
+        print('        %s=%s,' % (n, v))
     print('    ),')
+
 print(']')

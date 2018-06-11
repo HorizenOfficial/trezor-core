@@ -1,6 +1,7 @@
 from trezor.crypto.hashlib import ripemd160, sha256
+from trezor.messages.MultisigRedeemScriptType import MultisigRedeemScriptType
 from apps.wallet.sign_tx.multisig import multisig_get_pubkeys
-from apps.wallet.sign_tx.writers import *
+from apps.wallet.sign_tx.writers import bytearray_with_cap, write_bytes, write_varint, write_op_push
 
 
 class ScriptsError(ValueError):
@@ -39,7 +40,6 @@ def output_script_p2sh(scripthash: bytes) -> bytearray:
     s[2:22] = scripthash
     s[22] = 0x87  # OP_EQUAL
     return s
-
 
 # SegWit: Native P2WPKH or P2WSH
 # ===
@@ -88,6 +88,16 @@ def input_script_p2wpkh_in_p2sh(pubkeyhash: bytes) -> bytearray:
     w.append(0x14)  # P2WPKH witness program (pub key hash length)
     write_bytes(w, pubkeyhash)  # pub key hash
     return w
+
+def script_replay_protection(block_hash:bytes, block_height) -> bytearray:
+    block_height_size = len(block_height) #SIZE in bytes block heigh (should be 3)
+    s = bytearray(38)
+    s[0] = 0x20 #32 bytes for block hash
+    s[1:33] = block_hash #block hash
+    s[33] = 0x03 # 3 bytes for block height
+    s[34:37] = (block_height if (block_height_size == 3) else block_height[:3-block_height_size]) #MUST BE ONLY 3 BYTES FOR BLOCKHEIGHT 
+    s[37] = 0xB4 #OP_CHECKBLOCKHIGHT  
+    return s
 
 
 # SegWit: P2WSH nested in P2SH
