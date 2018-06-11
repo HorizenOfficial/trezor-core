@@ -14,7 +14,8 @@ class CoinInfo:
         segwit: bool,
         fork_id: int,
         force_bip143: bool,
-        version_group_id: int
+        version_group_id: int,
+        replay_protection: bool = False
     ):
         self.coin_name = coin_name
         self.coin_shortcut = coin_shortcut
@@ -29,6 +30,7 @@ class CoinInfo:
         self.fork_id = fork_id
         self.force_bip143 = force_bip143
         self.version_group_id = version_group_id
+        self.replay_protection = replay_protection
 
 
 # the following list is generated using tools/codegen/gen_coins.py
@@ -257,6 +259,22 @@ COINS = [
         segwit=True,
         fork_id=None,
         force_bip143=False,
+        version_group_id=None,
+    ),
+    CoinInfo(
+        coin_name='Zencash',
+        coin_shortcut='ZEN',
+        address_type=8329,
+        address_type_p2sh=8342,
+        maxfee_kb=2000000,
+        signed_message_header='Zencash Signed Message:\n',
+        xpub_magic=0x0488b21e,
+        bech32_prefix='zen',
+        cashaddr_prefix=None,
+        segwit=False,
+        fork_id=None,
+        force_bip143=False,
+        replay_protection = True,
         version_group_id=None,
     ),
 ]

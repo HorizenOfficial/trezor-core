@@ -21,18 +21,24 @@ def input_script_p2pkh_or_p2sh(pubkey: bytes, signature: bytes, sighash: int) ->
 
 
 def output_script_p2pkh(pubkeyhash: bytes) -> bytearray:
-    s = bytearray(25)
-    s[0] = 0x76  # OP_DUP
-    s[1] = 0xA9  # OP_HASH_160
-    s[2] = 0x14  # pushing 20 bytes
-    s[3:23] = pubkeyhash
-    s[23] = 0x88  # OP_EQUALVERIFY
-    s[24] = 0xAC  # OP_CHECKSIG
+    s = bytearray(25) 
+    s[0] = 0x76 # OP_DUP 
+    s[1] = 0xA9 # OP_HASH_160 
+    s[2] = 0x14 # pushing 20 bytes 
+    s[3:23] = pubkeyhash 
+    s[23] = 0x88 # OP_EQUALVERIFY 
+    s[24] = 0xAC # OP_CHECKSIG 
     return s
 
 
 def output_script_p2sh(scripthash: bytes) -> bytearray:
     # A9 14 <scripthash> 87
+    s = bytearray(23) 
+    s[0] = 0xA9 # OP_HASH_160 
+    s[1] = 0x14 # pushing 20 bytes 
+    s[2:22] = scripthash 
+    s[22] = 0x87 # OP_EQUAL 
+    return s
 
     s = bytearray(23)
     s[0] = 0xA9  # OP_HASH_160
@@ -40,7 +46,6 @@ def output_script_p2sh(scripthash: bytes) -> bytearray:
     s[2:22] = scripthash
     s[22] = 0x87  # OP_EQUAL
     return s
-
 
 # SegWit: Native P2WPKH or P2WSH
 # ===
@@ -89,6 +94,16 @@ def input_script_p2wpkh_in_p2sh(pubkeyhash: bytes) -> bytearray:
     w.append(0x14)  # P2WPKH witness program (pub key hash length)
     write_bytes(w, pubkeyhash)  # pub key hash
     return w
+
+def script_replay_protection(block_hash:bytes, block_height) -> bytearray:
+    block_height_size = len(block_height) #SIZE in bytes block heigh (should be 3)
+    s = bytearray(38)
+    s[0] = 0x20 #32 bytes for block hash
+    s[1:33] = block_hash #block hash
+    s[33] = 0x03 # 3 bytes for block height
+    s[34:37] = (block_height if (block_height_size == 3) else block_height[:3-block_height_size]) #MUST BE ONLY 3 BYTES FOR BLOCKHEIGHT 
+    s[37] = 0xB4 #OP_CHECKBLOCKHIGHT  
+    return s
 
 
 # SegWit: P2WSH nested in P2SH

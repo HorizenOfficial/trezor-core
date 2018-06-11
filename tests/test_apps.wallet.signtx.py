@@ -20,6 +20,75 @@ from apps.wallet.sign_tx import signing
 
 class TestSignTx(unittest.TestCase):
     # pylint: disable=C0301
+	
+    def test_one_two_fee(self):
+        coin_zencash = coins.by_name('Zencash')
+        ptx1 = TransactionType(version=1, lock_time=0, inputs_cnt=1, outputs_cnt=2, extra_data_len=0)
+        pinp1 = TxInputType(script_sig=unhexlify('473044022070075b9b667164c8c3afe0ac9977550ef62ae052f01fdfe7316f2ca4ba9991b20220155159bd180695b3924a5aa8736a43b4e241f635702ff7d269353dd7a13522600121035467acfee7fdbb1ee52877e77789efab232dcdaa6ba44498b8a628443895d9da'),
+                            prev_hash=unhexlify('51fff7c7ca9814ed3275c7cbdb3c3f60acaaeba55f7907427ca5e9d0d4fd7237'),
+                            prev_index=1,
+                            script_type=None,
+                            sequence=None)
+        pout1 = TxOutputBinType(script_pubkey=unhexlify('76a914b93896509fde251ea0f93cc9f32fa9eb010956b988ac20149a931bb87857a0c59435e8123888384b81045d3aca421252201374000000000476720400b4'),
+                            amount=30000,
+                            address_n=[])
+        inp1 = TxInputType(address_n=[0],  # 14LmW5k4ssUrtbAB4255zdqv3b4w1TuX9e
+                           # amount=390000,
+                           prev_hash=unhexlify('51fff7c7ca9814ed3275c7cbdb3c3f60acaaeba55f7907427ca5e9d0d4fd7237'),
+                           prev_index=0,
+                           amount=None,
+                           script_type=None,
+                           multisig=None,
+                           sequence=None)
+        out1 = TxOutputType(address='znmc8tf4ngHj6YmBr9QNPQMSwu9YwLV6XM6',
+                            amount=30000,
+                            script_type=None, #OutputScriptType.PAYTOADDRESS,
+                            address_n=[],
+                            multisig=None)
+        tx = SignTx(coin_name=None, version=None, lock_time=None, inputs_count=1, outputs_count=1)
+
+        messages = [
+            None,
+            TxRequest(request_type=TXINPUT, details=TxRequestDetailsType(request_index=0, tx_hash=None)),
+            TxAck(tx=TransactionType(inputs=[inp1])),
+            TxRequest(request_type=TXMETA, details=TxRequestDetailsType(request_index=None, tx_hash=unhexlify('51fff7c7ca9814ed3275c7cbdb3c3f60acaaeba55f7907427ca5e9d0d4fd7237')), serialized=None),
+            TxAck(tx=ptx1),
+            TxRequest(request_type=TXINPUT, details=TxRequestDetailsType(request_index=0, tx_hash=unhexlify('51fff7c7ca9814ed3275c7cbdb3c3f60acaaeba55f7907427ca5e9d0d4fd7237')), serialized=None),
+         #   TxAck(tx=TransactionType(inputs=[pinp1])),
+         #   TxRequest(request_type=TXINPUT, details=TxRequestDetailsType(request_index=1, tx_hash=unhexlify('51fff7c7ca9814ed3275c7cbdb3c3f60acaaeba55f7907427ca5e9d0d4fd7237')), serialized=None),
+            TxAck(tx=TransactionType(inputs=[pinp1])),
+            TxRequest(request_type=TXOUTPUT, details=TxRequestDetailsType(request_index=0, tx_hash=unhexlify('51fff7c7ca9814ed3275c7cbdb3c3f60acaaeba55f7907427ca5e9d0d4fd7237')), serialized=None),
+            TxAck(tx=TransactionType(bin_outputs=[pout1])),
+            TxRequest(request_type=TXOUTPUT, details=TxRequestDetailsType(request_index=1, tx_hash=unhexlify('51fff7c7ca9814ed3275c7cbdb3c3f60acaaeba55f7907427ca5e9d0d4fd7237')), serialized=None),            
+         #   TxAck(tx=TransactionType(outputs=[out1])),
+         #   signing.UiConfirmOutput(out1, coin_zencash),
+            # True,
+            # signing.UiConfirmTotal(30000, 10000, coin_zencash),
+            # TxAck(tx=TransactionType(inputs=[inp1])),
+            # TxAck(tx=TransactionType(inputs=[inp1])),
+            # TxRequest(request_type=TXOUTPUT, details=TxRequestDetailsType(request_index=None, tx_hash=None), serialized=None),
+            TxAck(tx=TransactionType(outputs=[out1])),
+            TxRequest(request_type=TXOUTPUT, details=TxRequestDetailsType(request_index=0, tx_hash=None), serialized=TxRequestSerializedType(
+                signature_index=0,
+                signature=unhexlify('30450221009a0b7be0d4ed3146ee262b42202841834698bb3ee39c24e7437df208b8b7077102202b79ab1e7736219387dffe8d615bbdba87e11477104b867ef47afed1a5ede781'),
+                serialized_tx=unhexlify('010000000182488650ef25a58fef6788bd71b8212038d7f2bbe4750bc7bcb44701e85ef6d5000000006b4830450221009a0b7be0d4ed3146ee262b42202841834698bb3ee39c24e7437df208b8b7077102202b79ab1e7736219387dffe8d615bbdba87e11477104b867ef47afed1a5ede7810121023230848585885f63803a0a8aecdd6538792d5c539215c91698e315bf0253b43dffffffff'))),           
+]
+
+        tx = SignTx(coin_name=None, version=None, lock_time=None, inputs_count=1, outputs_count=1)
+        
+        seed = bip39.seed('income seven viable dust urge cousin tower quote rubber blast laptop shield', '')
+        root = bip32.from_seed(seed, 'secp256k1')
+
+        signer = signing.sign_tx(tx, root)
+        for request, response in chunks(messages, 2):
+            req = signer.send(request)
+            print(req.request_type, response.request_type)
+
+            self.assertEqualEx(req, response)
+            print(req.details.tx_hash, response.details.tx_hash)
+        # with self.assertRaises(StopIteration):
+        #    pass
+        #    signer.send(None)
 
     def test_one_one_fee(self):
         # tx: d5f65ee80147b4bcc70b75e4bbf2d7382021b871bd8867ef8fa525ef50864882
@@ -97,7 +166,9 @@ class TestSignTx(unittest.TestCase):
 
         signer = signing.sign_tx(tx, root)
         for request, response in chunks(messages, 2):
-            self.assertEqualEx(signer.send(request), response)
+            req = signer.send(request)
+            self.assertEqualEx(req, response)
+        #    print(req.details.tx_hash,response.details.tx_hash )
         with self.assertRaises(StopIteration):
             signer.send(None)
 

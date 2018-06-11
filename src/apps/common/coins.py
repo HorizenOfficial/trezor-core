@@ -1,6 +1,5 @@
 from apps.common.coininfo import COINS
 
-
 def by_shortcut(shortcut):
     for c in COINS:
         if c.coin_shortcut == shortcut:
